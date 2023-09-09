@@ -1,6 +1,4 @@
-// HomeScreen.js
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -9,22 +7,44 @@ export default function HomeScreen({ navigation }) {
 
   const handleClockIn = async () => {
     const currentTime = new Date().toLocaleTimeString();
-    await AsyncStorage.setItem("clockInTime", currentTime);
+    const timePunch = { clockInTime: currentTime, clockOutTime: "" };
+    await AsyncStorage.setItem("timePunch", JSON.stringify(timePunch));
     setClockedIn(true);
   };
 
   const handleClockOut = async () => {
     const currentTime = new Date().toLocaleTimeString();
-    await AsyncStorage.setItem("clockOutTime", currentTime);
-    setClockedIn(false);
+    const storedTimePunch = await AsyncStorage.getItem("timePunch");
+
+    if (storedTimePunch) {
+      const timePunch = JSON.parse(storedTimePunch);
+      timePunch.clockOutTime = currentTime;
+
+      await AsyncStorage.setItem("timePunch", JSON.stringify(timePunch));
+      setClockedIn(false);
+    }
   };
+
+  useEffect(() => {
+    // Load time punch data and check if currently clocked in
+    async function loadTimePunchData() {
+      const storedTimePunch = await AsyncStorage.getItem("timePunch");
+      if (storedTimePunch) {
+        const timePunch = JSON.parse(storedTimePunch);
+        setClockedIn(!!timePunch.clockOutTime);
+      }
+    }
+    loadTimePunchData();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
-      <View style={styles.buttonContainer}>
-        <Button title={clockedIn ? "Clock Out" : "Clock In"} onPress={clockedIn ? handleClockOut : handleClockIn} />
-      </View>
+      {clockedIn ? (
+        <Button title="Clock Out" onPress={handleClockOut} />
+      ) : (
+        <Button title="Clock In" onPress={handleClockIn} />
+      )}
       <Button title="View History" onPress={() => navigation.navigate("History")} />
     </View>
   );
@@ -35,8 +55,5 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  buttonContainer: {
-    marginTop: 20, // Adjust the margin as needed
   },
 });
