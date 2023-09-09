@@ -1,5 +1,7 @@
+// HomeScreen.js
+
 import React, { useState } from "react";
-import { View, Text, Button } from "react-native";
+import { View, Text, Button, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation }) {
@@ -18,10 +20,23 @@ export default function HomeScreen({ navigation }) {
   };
 
   return (
-    <View>
-      {clockedIn ? <Text>You are clocked in.</Text> : <Text>You are clocked out.</Text>}
-      <Button title={clockedIn ? "Clock Out" : "Clock In"} onPress={clockedIn ? handleClockOut : handleClockIn} />
+    <View style={styles.container}>
+      <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
+      <View style={styles.buttonContainer}>
+        <Button title={clockedIn ? "Clock Out" : "Clock In"} onPress={clockedIn ? handleClockOut : handleClockIn} />
+      </View>
       <Button title="View History" onPress={() => navigation.navigate("History")} />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonContainer: {
+    marginTop: 20, // Adjust the margin as needed
+  },
+});
