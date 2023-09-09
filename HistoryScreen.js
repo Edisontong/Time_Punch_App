@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React from "react";
+import { View, Text, FlatList, StyleSheet } from "react-native";
 
 export default function HistoryScreen({ route }) {
   const { timePunches } = route.params;
@@ -8,15 +7,17 @@ export default function HistoryScreen({ route }) {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>History</Text>
-      <ScrollView>
-        {timePunches.map((entry, index) => (
-          <View key={index} style={styles.historyEntry}>
-            <Text style={styles.date}>{formatDate(entry.date)}</Text>
-            <Text>Clock In: {entry.clockInTime}</Text>
-            <Text>Clock Out: {entry.clockOutTime}</Text>
+      <FlatList
+        data={timePunches}
+        renderItem={({ item }) => (
+          <View style={styles.timePunch}>
+            <Text>Date: {item.date}</Text>
+            <Text>Clock In: {item.clockInTime}</Text>
+            <Text>Clock Out: {item.clockOutTime}</Text>
           </View>
-        ))}
-      </ScrollView>
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
     </View>
   );
 }
@@ -31,26 +32,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
   },
-  historyEntry: {
-    marginBottom: 16,
-    padding: 8,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 8,
-  },
-  date: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 8,
+  timePunch: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
   },
 });
-
-const formatDate = (dateString) => {
-  const options = { year: "numeric", month: "long", day: "numeric" };
-  const parsedDate = new Date(dateString);
-
-  if (isNaN(parsedDate)) {
-    return "Invalid Date";
-  }
-
-  return parsedDate.toLocaleDateString(undefined, options);
-};

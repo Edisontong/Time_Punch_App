@@ -43,14 +43,18 @@ export default function HomeScreen({ navigation }) {
   const handleClockOut = () => {
     const currentTime = new Date().toLocaleTimeString();
 
-    if (timePunches.length > 0) {
+    if (clockedIn && timePunches.length > 0) {
       const updatedTimePunches = [...timePunches];
-      updatedTimePunches[timePunches.length - 1].clockOutTime = currentTime;
-      setTimePunches(updatedTimePunches);
-      saveTimePunches(updatedTimePunches);
-    }
+      const lastTimePunch = updatedTimePunches[updatedTimePunches.length - 1];
 
-    setClockedIn(false);
+      // Check if the last time punch has a clockInTime but no clockOutTime
+      if (lastTimePunch.clockInTime && !lastTimePunch.clockOutTime) {
+        lastTimePunch.clockOutTime = currentTime;
+        setTimePunches(updatedTimePunches);
+        saveTimePunches(updatedTimePunches);
+        setClockedIn(false);
+      }
+    }
   };
 
   return (
