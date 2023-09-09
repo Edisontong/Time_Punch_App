@@ -7,7 +7,6 @@ export default function HomeScreen({ navigation }) {
   const [timePunches, setTimePunches] = useState([]);
 
   useEffect(() => {
-    // Load time punches when the component mounts
     loadTimePunches();
   }, []);
 
@@ -36,7 +35,6 @@ export default function HomeScreen({ navigation }) {
     const newTimePunch = { date: new Date().toISOString(), clockInTime: currentTime, clockOutTime: "" };
     setClockedIn(true);
 
-    // Add the new time punch to the list and save it
     const updatedTimePunches = [...timePunches, newTimePunch];
     setTimePunches(updatedTimePunches);
     saveTimePunches(updatedTimePunches);
@@ -45,7 +43,6 @@ export default function HomeScreen({ navigation }) {
   const handleClockOut = () => {
     const currentTime = new Date().toLocaleTimeString();
 
-    // Update the latest time punch's clockOutTime and save it
     if (timePunches.length > 0) {
       const updatedTimePunches = [...timePunches];
       updatedTimePunches[timePunches.length - 1].clockOutTime = currentTime;
