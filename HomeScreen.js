@@ -1,41 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
+  const [timePunches, setTimePunches] = useState([]); // Maintain a list of time punches
 
-  const handleClockIn = async () => {
+  const handleClockIn = () => {
     const currentTime = new Date().toLocaleTimeString();
-    const timePunch = { clockInTime: currentTime, clockOutTime: "" };
-    await AsyncStorage.setItem("timePunch", JSON.stringify(timePunch));
+    const newTimePunch = { clockInTime: currentTime, clockOutTime: "" };
     setClockedIn(true);
+
+    // Add the new time punch to the list
+    setTimePunches([...timePunches, newTimePunch]);
   };
 
-  const handleClockOut = async () => {
+  const handleClockOut = () => {
     const currentTime = new Date().toLocaleTimeString();
-    const storedTimePunch = await AsyncStorage.getItem("timePunch");
 
-    if (storedTimePunch) {
-      const timePunch = JSON.parse(storedTimePunch);
-      timePunch.clockOutTime = currentTime;
-
-      await AsyncStorage.setItem("timePunch", JSON.stringify(timePunch));
-      setClockedIn(false);
+    // Update the latest time punch's clockOutTime
+    if (timePunches.length > 0) {
+      const updatedTimePunches = [...timePunches];
+      updatedTimePunches[timePunches.length - 1].clockOutTime = currentTime;
+      setTimePunches(updatedTimePunches);
     }
+
+    setClockedIn(false);
   };
-
-  useEffect(() => {
-    // Load time punch data and check if currently clocked in
-    async function loadTimePunchData() {
-      const storedTimePunch = await AsyncStorage.getItem("timePunch");
-      if (storedTimePunch) {
-        const timePunch = JSON.parse(storedTimePunch);
-        setClockedIn(!!timePunch.clockOutTime);
-      }
-    }
-    loadTimePunchData();
-  }, []);
 
   return (
     <View style={styles.container}>
@@ -45,7 +35,7 @@ export default function HomeScreen({ navigation }) {
       ) : (
         <Button title="Clock In" onPress={handleClockIn} />
       )}
-      <Button title="View History" onPress={() => navigation.navigate("History")} />
+      <Button title="View History" onPress={() => navigation.navigate("History", { timePunches })} />
     </View>
   );
 }

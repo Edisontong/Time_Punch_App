@@ -1,30 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export default function HistoryScreen() {
-  const [history, setHistory] = useState([]);
-
-  useEffect(() => {
-    loadHistory();
-  }, []);
-
-  const loadHistory = async () => {
-    try {
-      const storedTimePunch = await AsyncStorage.getItem("timePunch");
-      if (storedTimePunch) {
-        const timePunch = JSON.parse(storedTimePunch);
-        setHistory([timePunch]);
-      }
-    } catch (error) {
-      console.error("Error loading history:", error);
-    }
-  };
+export default function HistoryScreen({ route }) {
+  const { timePunches } = route.params;
 
   return (
     <View style={styles.container}>
       <ScrollView>
-        {history.map((entry, index) => (
+        {timePunches.map((entry, index) => (
           <View key={index} style={styles.historyEntry}>
             <Text>Clock In: {entry.clockInTime}</Text>
             <Text>Clock Out: {entry.clockOutTime}</Text>
