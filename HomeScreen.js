@@ -5,7 +5,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
   const [timePunches, setTimePunches] = useState([]);
-  const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
@@ -13,20 +12,18 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    let timer;
+    let interval;
 
-    if (startTime) {
-      timer = setInterval(() => {
-        const currentTime = new Date().getTime();
-        const elapsedTime = (currentTime - startTime) / 1000; // in seconds
-        setElapsedTime(elapsedTime);
-      }, 1000); // Update every second
+    if (clockedIn) {
+      interval = setInterval(() => {
+        setElapsedTime((prevElapsedTime) => prevElapsedTime + 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
     }
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, [startTime]);
+    return () => clearInterval(interval);
+  }, [clockedIn]);
 
   const saveTimePunches = async (timePunches) => {
     try {
@@ -52,7 +49,6 @@ export default function HomeScreen({ navigation }) {
     const currentTime = new Date().toLocaleTimeString();
     const newTimePunch = { date: new Date().toISOString(), clockInTime: currentTime, clockOutTime: "" };
     setClockedIn(true);
-    setStartTime(new Date().getTime());
 
     const updatedTimePunches = [...timePunches, newTimePunch];
     setTimePunches(updatedTimePunches);
@@ -72,20 +68,22 @@ export default function HomeScreen({ navigation }) {
         setTimePunches(updatedTimePunches);
         saveTimePunches(updatedTimePunches);
         setClockedIn(false);
-        setStartTime(null); // Reset the timer
       }
     }
   };
 
   return (
     <View style={styles.container}>
+      <Text style={styles.timer}>
+        {clockedIn
+          ? `Time Elapsed: ${Math.floor(elapsedTime / 3600)}h ${Math.floor((elapsedTime % 3600) / 60)}m ${Math.floor(
+              elapsedTime % 60
+            )}s`
+          : ""}
+      </Text>
       <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
       {clockedIn ? (
         <View>
-          <Text>
-            Time Elapsed: {Math.floor(elapsedTime / 3600)}h {Math.floor((elapsedTime % 3600) / 60)}m{" "}
-            {Math.floor(elapsedTime % 60)}s
-          </Text>
           <Button title="Clock Out" onPress={handleClockOut} />
         </View>
       ) : (
@@ -101,5 +99,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  timer: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
   },
 });
