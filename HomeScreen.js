@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const HomeScreen = ({ navigation }) => {
+export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
 
   const handleClockIn = async () => {
@@ -24,6 +24,4 @@ const HomeScreen = ({ navigation }) => {
       <Button title="View History" onPress={() => navigation.navigate("History")} />
     </View>
   );
-};
-
-export default HomeScreen;
+}

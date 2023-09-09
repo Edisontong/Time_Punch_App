@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, Button } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const HistoryScreen = () => {
+export default function HistoryScreen() {
   const [history, setHistory] = useState([]);
 
   const loadHistory = async () => {
@@ -25,6 +25,4 @@ const HistoryScreen = () => {
       ))}
     </View>
   );
-};
-
-export default HistoryScreen;
+}
