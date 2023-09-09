@@ -5,10 +5,28 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function HomeScreen({ navigation }) {
   const [clockedIn, setClockedIn] = useState(false);
   const [timePunches, setTimePunches] = useState([]);
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
 
   useEffect(() => {
     loadTimePunches();
   }, []);
+
+  useEffect(() => {
+    let timer;
+
+    if (startTime) {
+      timer = setInterval(() => {
+        const currentTime = new Date().getTime();
+        const elapsedTime = (currentTime - startTime) / 1000; // in seconds
+        setElapsedTime(elapsedTime);
+      }, 1000); // Update every second
+    }
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [startTime]);
 
   const saveTimePunches = async (timePunches) => {
     try {
@@ -34,6 +52,7 @@ export default function HomeScreen({ navigation }) {
     const currentTime = new Date().toLocaleTimeString();
     const newTimePunch = { date: new Date().toISOString(), clockInTime: currentTime, clockOutTime: "" };
     setClockedIn(true);
+    setStartTime(new Date().getTime());
 
     const updatedTimePunches = [...timePunches, newTimePunch];
     setTimePunches(updatedTimePunches);
@@ -53,6 +72,7 @@ export default function HomeScreen({ navigation }) {
         setTimePunches(updatedTimePunches);
         saveTimePunches(updatedTimePunches);
         setClockedIn(false);
+        setStartTime(null); // Reset the timer
       }
     }
   };
@@ -61,7 +81,13 @@ export default function HomeScreen({ navigation }) {
     <View style={styles.container}>
       <Text>{clockedIn ? "You are clocked in." : "You are clocked out."}</Text>
       {clockedIn ? (
-        <Button title="Clock Out" onPress={handleClockOut} />
+        <View>
+          <Text>
+            Time Elapsed: {Math.floor(elapsedTime / 3600)}h {Math.floor((elapsedTime % 3600) / 60)}m{" "}
+            {Math.floor(elapsedTime % 60)}s
+          </Text>
+          <Button title="Clock Out" onPress={handleClockOut} />
+        </View>
       ) : (
         <Button title="Clock In" onPress={handleClockIn} />
       )}
