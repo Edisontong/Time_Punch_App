@@ -6,8 +6,9 @@ export default function HomeScreen({ navigation }) {
   const [timePunches, setTimePunches] = useState([]); // Maintain a list of time punches
 
   const handleClockIn = () => {
-    const currentTime = new Date().toLocaleTimeString();
-    const newTimePunch = { clockInTime: currentTime, clockOutTime: "" };
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString(); // Save the date along with the time
+    const newTimePunch = { date: formattedDate, clockInTime: currentDate.toLocaleTimeString(), clockOutTime: "" };
     setClockedIn(true);
 
     // Add the new time punch to the list
