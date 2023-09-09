@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function HistoryScreen({ route }) {
   const { timePunches } = route.params;
@@ -7,17 +7,15 @@ export default function HistoryScreen({ route }) {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>History</Text>
-      <FlatList
-        data={timePunches}
-        renderItem={({ item }) => (
-          <View style={styles.timePunch}>
-            <Text>Date: {item.date}</Text>
-            <Text>Clock In: {item.clockInTime}</Text>
-            <Text>Clock Out: {item.clockOutTime}</Text>
+      <View>
+        {timePunches.map((timePunch, index) => (
+          <View style={styles.historyEntry} key={index}>
+            <Text style={styles.date}>{getFormattedDate(timePunch.date)}</Text>
+            <Text>Start Time: {getFormattedTime(timePunch.clockInTime)}</Text>
+            <Text>End Time: {getFormattedTime(timePunch.clockOutTime)}</Text>
           </View>
-        )}
-        keyExtractor={(item, index) => index.toString()}
-      />
+        ))}
+      </View>
     </View>
   );
 }
@@ -32,9 +30,27 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 16,
   },
-  timePunch: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
+  historyEntry: {
+    marginBottom: 16,
+    padding: 8,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 8,
+  },
+  date: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 8,
   },
 });
+
+const getFormattedDate = (dateString) => {
+  const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, options);
+};
+
+const getFormattedTime = (timeString) => {
+  const options = { hour: "numeric", minute: "numeric" };
+  const time = new Date(`2023-01-01T${timeString}`);
+  return time.toLocaleTimeString(undefined, options);
+};
