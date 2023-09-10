@@ -1,11 +1,11 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, ScrollView, Text, StyleSheet } from "react-native";
 
 export default function HistoryScreen({ route }) {
   const { timePunches } = route.params;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.header}>History</Text>
       <View>
         {timePunches.map((timePunch, index) => (
@@ -16,7 +16,7 @@ export default function HistoryScreen({ route }) {
           </View>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
